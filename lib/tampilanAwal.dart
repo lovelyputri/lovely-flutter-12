@@ -96,7 +96,7 @@ class tampilanAwal extends StatelessWidget {
               ),
               TextField(
                 decoration: InputDecoration(
-                  labelText: 'Hobi',
+                  labelText: 'Hobii',
                   prefixIcon: Icon(Icons.interests),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(17),
