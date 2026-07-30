@@ -29,6 +29,14 @@ class _tampilanAwalState extends State<tampilanAwal> {
       'jurusan': jurusanController.text,
       'hobi': hobiController.text
     });
+    
+    // Mengosongkan semua input
+      namaController.clear();
+      kelasController.clear();
+      nisnController.clear();
+      alamatController.clear();
+      jurusanController.clear();
+      hobiController.clear();
   }
 
   @override
