@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_biodata/tampilData.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; //import supabase 
 
-class tampilanAwal extends StatefulWidget {
-  const tampilanAwal({super.key});
+class editsiswa extends StatefulWidget {
+  editsiswa({super.key, required this.id});
+  
+
+  final int id;
 
   @override
-  State<tampilanAwal> createState() => _tampilanAwalState();
+  State<editsiswa> createState() => _editsiswaState();
 }
 
-class _tampilanAwalState extends State<tampilanAwal> {
+class _editsiswaState extends State<editsiswa> {
   final namaController = TextEditingController(); //tambah controller untuk menampung data inputan
   final kelasController = TextEditingController();
   final nisnController = TextEditingController();
@@ -20,46 +21,46 @@ class _tampilanAwalState extends State<tampilanAwal> {
 
   final supabase = Supabase.instance.client; // untuk pemanggillan supabase
 
-  //simpan data ke supabase
-  void simpanData() async {
+  Future<void> ambilData() async {
+    final data = await supabase
+    .from('siswa')
+    .select()
+    .eq('id', widget.id)
+    .single();
 
-    if (namaController.text.isEmpty ||  //kayak pop up apabila data kosong
-        kelasController.text.isEmpty ||
-        nisnController.text.isEmpty ||
-        alamatController.text.isEmpty ||
-        jurusanController.text.isEmpty ||
-        hobiController.text.isEmpty) {
-          // pesan apabila pesan kosong
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('Data tidak boleh kosong'),
-            backgroundColor: Colors.red,
-          ));
-          return;
-        }
+    namaController.text = data['nama'];
+    kelasController.text = data['kelas'];
+    nisnController.text = data['nisn'];
+    alamatController.text = data['alamat'];
+    jurusanController.text = data['jurusan'];
+    hobiController.text = data['hobi'];
+  }
 
-    await supabase.from('siswa').insert({ // siswa merupakan nama tabel yang ada disupabase, insert untuk menambhakan data 
-      'nama': namaController.text, 
-      'kelas': kelasController.text,
-      'nisn': nisnController.text,
-      'alamat': alamatController.text,
-      'jurusan': jurusanController.text,
-      'hobi': hobiController.text
-    });
-    
-    // Mengosongkan semua input
-      namaController.clear();
-      kelasController.clear();
-      nisnController.clear();
-      alamatController.clear();
-      jurusanController.clear();
-      hobiController.clear();
+    Future<void> updateData() async {
+      await supabase
+      .from('siswa')
+      .update({
+       'nama' : namaController.text,
+       'kelas' : kelasController.text,
+       'nisn' : nisnController.text,
+       'alamat' : alamatController.text,
+       'jurusan' : jurusanController.text,
+       'hobi' : hobiController.text,
+    })
+      .eq('id', widget.id);
+    }
+
+  @override
+  void initState() {
+    super.initState();
+    ambilData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('FORM BIODATA'), //text didalam header nya
+        title: Text('EDIT DATA SISWA'), //text didalam header nya
         centerTitle: true, // harus didalam appBar fungsinya untuk menaruh di tengah
         backgroundColor:  Color.fromARGB(255, 255, 168, 207), //warna header
         foregroundColor: Colors.white, //warna dalam header nya (text)
@@ -73,15 +74,15 @@ class _tampilanAwalState extends State<tampilanAwal> {
               CircleAvatar(
                 radius: 50, //untuk ukuran bentuk bulat
                 backgroundColor:  Color.fromARGB(255, 255, 168, 207), //warna icon
-                child: Icon(Icons.person, // bentuk atau jenis icon 
+                child: Icon(Icons.edit, // bentuk atau jenis icon 
                 color: Colors.white, //warna icon
                 size: 55, // ukuran icon
                 ),
               ),
               SizedBox(height: 20,), // mengasih jarak dari icon
-              Text('DATA BIODATA SISWA', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('EDIT DATA SISWA', style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 4), // mengasih jarak dari icon
-              Text('Lengkapi data dibawah ini', style: TextStyle(fontSize: 10)),
+              Text('Edit data dibawah ini', style: TextStyle(fontSize: 10)),
               SizedBox(
                 height: 30
               ),
@@ -166,39 +167,19 @@ class _tampilanAwalState extends State<tampilanAwal> {
               SizedBox(
                 width: double.infinity,
                 height: 45,// memanjangkan button
-                child: ElevatedButton(onPressed: () async {
-                  simpanData(); // untuk memanggil fungsi simpan data
+                child: ElevatedButton(
+                  onPressed: () async { 
+                    await updateData();
+                    Navigator.pop(context); //button untuk update
                 },  // untuk memebuat button
-                 child: Text('Submit'),
                  style: ElevatedButton.styleFrom( // untuk kasih style pada button
                   backgroundColor: Color.fromARGB(255, 255, 168, 207), // warna backround button
                   foregroundColor: Colors.white, // warna text button
                   textStyle: TextStyle(fontSize: 18),
                  ),
+                 child: Text('Update'),
                 ),
               ),
-               SizedBox(
-                height: 10, // untuk jarak
-              ),
-              SizedBox(
-                width: double.infinity,
-                height: 45,// memanjangkan button
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                       MaterialPageRoute(
-                        builder: (context) => tampilData()));
-                  }, // untuk memanggil fungsi simpan data 
-                  style: ElevatedButton.styleFrom( // untuk kasih style pada button
-                    backgroundColor: Color.fromARGB(255, 255, 168, 207), // warna backround button
-                    foregroundColor: Colors.white, // warna text button
-                    textStyle: TextStyle(fontSize: 18),
-                 ),
-                  child: Text('Lihat Data'),
-                ),
-              ),
-              
             ]),
           )),
         ),
